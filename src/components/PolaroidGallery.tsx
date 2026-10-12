@@ -6,6 +6,45 @@ interface Props {
   memories: MemoryPhoto[];
 }
 
+const EXTENSIONS = ['.jpeg', '.jpg', '.JPEG', '.JPG', '.png', '.PNG', '.webp'];
+
+function SmartImage({ src, alt, className }: { src: string; alt: string; className: string }) {
+  const normalizedInitial = src.startsWith('/') ? '.' + src : src;
+  const [currentSrc, setCurrentSrc] = useState(normalizedInitial);
+  const [tryIndex, setTryIndex] = useState(0);
+  const [hasFailedAll, setHasFailedAll] = useState(false);
+
+  const handleError = () => {
+    const basePath = normalizedInitial.replace(/\.[^/.]+$/, '');
+    if (tryIndex < EXTENSIONS.length) {
+      const nextSrc = `${basePath}${EXTENSIONS[tryIndex]}`;
+      setTryIndex((prev) => prev + 1);
+      setCurrentSrc(nextSrc);
+    } else {
+      setHasFailedAll(true);
+    }
+  };
+
+  if (hasFailedAll) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-rose-50 text-rose-300 text-4xl">
+        🌸
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={currentSrc}
+      alt={alt}
+      loading="lazy"
+      referrerPolicy="no-referrer"
+      onError={handleError}
+      className={className}
+    />
+  );
+}
+
 export function PolaroidGallery({ memories }: Props) {
   const [activePhoto, setActivePhoto] = useState<MemoryPhoto | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -28,7 +67,7 @@ export function PolaroidGallery({ memories }: Props) {
 
   return (
     <section id="galeri" className="relative py-12 px-4 sm:px-6 max-w-4xl mx-auto">
-      {/* SWIPE CAROUSEL (Clean, pure photos only, no captions or text headers) */}
+      {/* SWIPE CAROUSEL (Clean, pure photos only, supports both .jpg and .jpeg automatically) */}
       <div className="relative">
         <div
           ref={scrollRef}
@@ -61,24 +100,11 @@ export function PolaroidGallery({ memories }: Props) {
                     className="absolute -top-3 left-1/2 -translate-x-1/2 w-20 h-5 bg-rose-200/70 border-t border-b border-rose-300/40 backdrop-blur-xs transform -rotate-1 shadow-xs z-10 opacity-85"
                   />
 
-                  {/* Clean photo slot */}
+                  {/* Clean photo slot with auto .jpeg / .jpg fallback */}
                   <div className="relative aspect-square w-full overflow-hidden bg-stone-100 rounded-xs">
-                    <img
+                    <SmartImage
                       src={photo.image}
                       alt={`Foto kenangan ${idx + 1}`}
-                      loading="lazy"
-                      referrerPolicy="no-referrer"
-                      onError={(e) => {
-                        const target = e.currentTarget;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          const fallback = document.createElement('div');
-                          fallback.className = 'w-full h-full flex items-center justify-center bg-rose-50 text-rose-300 text-4xl';
-                          fallback.innerHTML = `🌸`;
-                          parent.appendChild(fallback);
-                        }
-                      }}
                       className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     />
                   </div>
@@ -124,7 +150,7 @@ export function PolaroidGallery({ memories }: Props) {
         </div>
       </div>
 
-      {/* LIGHTBOX MODAL (Pure photo preview on tap) */}
+      {/* LIGHTBOX MODAL */}
       {activePhoto && (
         <div
           role="dialog"
@@ -145,11 +171,10 @@ export function PolaroidGallery({ memories }: Props) {
             </button>
 
             <div className="aspect-square w-full rounded-md overflow-hidden bg-stone-100">
-              <img
+              <SmartImage
                 src={activePhoto.image}
                 alt="Kenangan"
                 className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
               />
             </div>
           </div>

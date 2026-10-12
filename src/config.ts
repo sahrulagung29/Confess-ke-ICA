@@ -89,22 +89,22 @@ export const defaultConfig: LoveConfig = {
   memories: [
     {
       id: 1,
-      image: "/images/foto1.jpg",
+      image: "./images/foto1.jpg",
       rotation: -2,
     },
     {
       id: 2,
-      image: "/images/foto2.jpg",
+      image: "./images/foto2.jpg",
       rotation: 1.5,
     },
     {
       id: 3,
-      image: "/images/foto3.jpg",
+      image: "./images/foto3.jpg",
       rotation: -1.5,
     },
     {
       id: 4,
-      image: "/images/foto4.jpg",
+      image: "./images/foto4.jpg",
       rotation: 2,
     },
   ],

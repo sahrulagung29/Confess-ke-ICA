@@ -1,0 +1,6 @@
+{
+  "name": "Surat Cinta Digital",
+  "description": "Website romantis satu halaman (single page) untuk menyatakan perasaan dengan pemutar lagu YouTube, galeri kenangan polaroid, dan ungkapan hati hangat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
